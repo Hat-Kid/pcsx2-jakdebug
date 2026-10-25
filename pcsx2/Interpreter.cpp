@@ -8,6 +8,7 @@
 #include "Cache.h"
 
 #include "DebugTools/Breakpoints.h"
+#include "Jak/JakGoalDebugInspect.h"
 
 #include "common/FastJmp.h"
 
@@ -23,6 +24,11 @@ static std::string disOut;
 static bool intExitExecution = false;
 static fastjmp_buf intJmpBuf;
 static u32 intLastBranchTo;
+
+bool g_eeIsolatedExecution = false;
+bool g_eeIsolatedFault = false;
+int g_eeIsolatedSyscall = -1;
+std::string g_eeIsolatedTty;
 
 void intEventTest();
 
@@ -162,16 +168,22 @@ static void execI()
 	// not yet usable with the interpreter
 //#define EXTRA_DEBUG
 #if defined(EXTRA_DEBUG) || defined(PCSX2_DEVBUILD)
-	// check if any breakpoints or memchecks are triggered by this instruction
-	if (isBreakpointNeeded(cpuRegs.pc))
-		intBreakpoint(false);
+	if (!g_eeIsolatedExecution)
+	{
+		// check if any breakpoints or memchecks are triggered by this instruction
+		if (isBreakpointNeeded(cpuRegs.pc))
+			intBreakpoint(false);
 
-	intCheckMemcheck();
+		intCheckMemcheck();
 
-	CBreakPoints::CommitClearSkipFirst(BREAKPOINT_EE);
+		CBreakPoints::CommitClearSkipFirst(BREAKPOINT_EE);
+	}
 #endif
 
 	const u32 pc = cpuRegs.pc;
+	if (GoalAnalysis::g_interpreter_hooks && !g_eeIsolatedExecution)
+		GoalAnalysis::InterpreterCheck(pc);
+
 	// We need to increase the pc before executing the memRead32. An exception could appears
 	// and it expects the PC counter to be pre-incremented
 	cpuRegs.pc += 4;
@@ -533,6 +545,12 @@ void JALR()
 {
 	const u32 temp = cpuRegs.GPR.r[_Rs_].UL[0];
 
+	if (GoalAnalysis::ShouldHookCallSites() && _Rs_ == 25 && _Rd_ == 31 && !g_eeIsolatedExecution)
+	{
+		GoalAnalysis::NoteCallSite(cpuRegs.pc + 4);
+		GoalAnalysis::OnCallSite(cpuRegs.pc + 4);
+	}
+
 	if (_Rd_)  _SetLink(_Rd_);
 
 	doBranch(temp);
@@ -558,6 +576,9 @@ static void intReset()
 
 void intEventTest()
 {
+	if (g_eeIsolatedExecution)
+		return;
+
 	// Perform counters, ints, and IOP updates:
 	_cpuEventTest_Shared();
 
@@ -661,6 +682,11 @@ static void intExecute()
 }
 
 static void intStep()
+{
+	execI();
+}
+
+void intStepIsolated()
 {
 	execI();
 }

@@ -78,7 +78,8 @@ oprofile_data/
 /bin/bios
 /bin/cache
 /bin/cheats
-/bin/patches
+/bin/patches/*
+!/bin/patches/*_DebugMode.pnach
 /bin/covers
 /bin/dumps
 /bin/gamesettings

@@ -26,6 +26,8 @@
 #include "MTGS.h"
 #include "MTVU.h"
 #include "PINE.h"
+#include "Jak/GoalReplServer.h"
+#include "Jak/JakGoalDebugInspect.h"
 #include "Patch.h"
 #include "PerformanceMetrics.h"
 #include "R3000A.h"
@@ -427,6 +429,7 @@ bool VMManager::Internal::CPUThreadInitialize()
 		Achievements::Initialize();
 
 	ReloadPINE();
+	GoalReplServer::ApplySettings();
 
 	if (EmuConfig.EnableDiscordPresence)
 		InitializeDiscordPresence();
@@ -443,6 +446,7 @@ void VMManager::Internal::CPUThreadShutdown()
 	ShutdownDiscordPresence();
 
 	PINEServer::Deinitialize();
+	GoalReplServer::Stop();
 
 	Achievements::Shutdown(false);
 
@@ -2991,10 +2995,14 @@ void VMManager::Internal::PollInputOnCPUThread()
 void VMManager::CheckForCPUConfigChanges(const Pcsx2Config& old_config)
 {
 	if (EmuConfig.Cpu == old_config.Cpu && EmuConfig.Gamefixes == old_config.Gamefixes &&
-		EmuConfig.Speedhacks == old_config.Speedhacks && EmuConfig.Profiler == old_config.Profiler)
+		EmuConfig.Speedhacks == old_config.Speedhacks && EmuConfig.Profiler == old_config.Profiler &&
+		EmuConfig.EnableJakFunctionAnalysis == old_config.EnableJakFunctionAnalysis)
 	{
 		return;
 	}
+
+	// the analysis hooks are compiled into blocks, so the caches below need to go either way
+	GoalAnalysis::OnSettingsChanged(EmuConfig.EnableJakFunctionAnalysis);
 
 	Console.WriteLn("Updating CPU configuration...");
 	FPControlRegister::SetCurrent(EmuConfig.Cpu.FPUFPCR);
@@ -3132,6 +3140,9 @@ void VMManager::CheckForMiscConfigChanges(const Pcsx2Config& old_config)
 
 	if (EmuConfig.InhibitScreensaver != old_config.InhibitScreensaver)
 		UpdateInhibitScreensaver(EmuConfig.InhibitScreensaver && VMManager::GetState() == VMState::Running);
+
+	if (EmuConfig.EnableJakReplServer != old_config.EnableJakReplServer)
+		GoalReplServer::ApplySettings();
 
 	if (EmuConfig.EnableDiscordPresence != old_config.EnableDiscordPresence)
 	{

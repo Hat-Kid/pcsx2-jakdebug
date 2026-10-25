@@ -1361,6 +1361,8 @@ struct Pcsx2Config
 		EnablePINE : 1, // enables inter-process communication
 		EnableWideScreenPatches : 1,
 		EnableNoInterlacingPatches : 1,
+		EnableJakFunctionAnalysis : 1, // hooks every GOAL call site, see Jak/JakGoalDebugInspect.h
+		EnableJakReplServer : 1, // GOAL REPL over TCP on localhost, see Jak/GoalReplServer.h
 		EnableFastBoot : 1,
 		EnableFastBootFastForward : 1,
 		EnableThreadPinning : 1,

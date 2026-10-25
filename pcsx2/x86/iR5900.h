@@ -129,6 +129,9 @@ void _deleteEEreg128(int reg);
 
 void _flushEEreg(int reg, bool clear = false);
 
+// flushes the registers the jak call analysis reads and calls func(arg)
+void recGoalAnalysisHook(const void* func, u32 arg);
+
 int _eeTryRenameReg(int to, int from, int fromx86, int other, int xmminfo);
 
 //////////////////////////////////////

@@ -5,6 +5,7 @@
 #include "CDVD/CDVD.h"
 #include "DebugTools/Breakpoints.h"
 #include "Elfheader.h"
+#include "Jak/JakGoalDebugInspect.h"
 #include "GS.h"
 #include "Host.h"
 #include "Memory.h"
@@ -1638,6 +1639,15 @@ void recMemcheck(u32 op, u32 bits, bool store)
 	}
 }
 
+void recGoalAnalysisHook(const void* func, u32 arg)
+{
+	// only flush what the hook looks at (v0, args, s6, s7, t9, sp, ra), much cheaper than FLUSH_INTERPRETER
+	for (const int reg : {2, 4, 5, 6, 7, 8, 9, 10, 11, 22, 23, 25, 29, 31})
+		_flushEEreg(reg);
+	iFlushCall(FLUSH_NONE);
+	xFastCall(func, arg);
+}
+
 bool encodeBreakpoint()
 {
 	if (isBreakpointNeeded(pc) != 0)
@@ -1688,6 +1698,9 @@ void recompileNextInstruction(bool delayslot, bool swapped_delay_slot)
 	// add breakpoint
 	if (!delayslot)
 	{
+		if (GoalAnalysis::HasHookAddresses() && GoalAnalysis::IsHookAddress(pc))
+			recGoalAnalysisHook(reinterpret_cast<const void*>(GoalAnalysis::OnHookAddress), pc);
+
 		if(encodeBreakpoint() || encodeMemcheck())
 			xFastCall((void*)CBreakPoints::CommitClearSkipFirst, BREAKPOINT_EE);
 	}

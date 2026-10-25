@@ -6,6 +6,7 @@
 #include "common/Pcsx2Defs.h"
 
 #include <array>
+#include <string>
 
 // --------------------------------------------------------------------------------------
 //  EE Bios function name tables.
@@ -289,6 +290,15 @@ void intSetBranch();
 // This is a special form of the interpreter's doBranch that is run from various
 // parts of the Recs (namely COP0's branch codes and stuff).
 void intDoBranch(u32 target);
+
+// Isolated execution, used by the Jak debugger to call guest functions synchronously.
+// While set, the interpreter skips event tests and breakpoints, and memory faults only
+// raise g_eeIsolatedFault instead of exceptions.
+extern bool g_eeIsolatedExecution;
+extern bool g_eeIsolatedFault;
+extern int g_eeIsolatedSyscall; // syscall that ended isolated execution, -1 if none
+extern std::string g_eeIsolatedTty; // deci2 kputs output printed during isolated execution
+void intStepIsolated();
 
 // modules loaded at hardcoded addresses by the kernel
 const u32 EEKERNEL_START	= 0;

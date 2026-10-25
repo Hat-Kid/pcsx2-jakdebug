@@ -1203,6 +1203,34 @@ void SYSCALL()
 			break;
 	}
 
+	if (g_eeIsolatedExecution)
+	{
+		// the jak debugger runs guest calls without the bios kernel, so finish syscalls that only print or
+		// touch caches here and stop on anything else (it could block or switch threads)
+		static constexpr u8 FLUSH_CACHE = 100;
+		static constexpr u8 IFLUSH_CACHE = 104;
+		switch (call)
+		{
+			case Syscall::Deci2Call:
+				if (cpuRegs.GPR.n.a0.UL[0] == 0x10)
+				{
+					if (const char* text = static_cast<const char*>(PSM(memRead32(cpuRegs.GPR.n.a1.UL[0]))))
+						g_eeIsolatedTty += text;
+				}
+				cpuRegs.GPR.n.v0.UD[0] = 1;
+				return;
+			case Syscall::sysPrintOut:
+			case FLUSH_CACHE:
+			case IFLUSH_CACHE:
+				cpuRegs.GPR.n.v0.UD[0] = 0;
+				return;
+			default:
+				g_eeIsolatedSyscall = call;
+				g_eeIsolatedFault = true;
+				return;
+		}
+	}
+
 	cpuRegs.pc -= 4;
 	cpuException(0x20, cpuRegs.branch);
 }

@@ -280,6 +280,9 @@
     <ClCompile Include="Debugger\ModuleView.cpp">
       <Filter>Debugger</Filter>
     </ClCompile>
+    <ClCompile Include="Debugger\GoalReplView.cpp">
+      <Filter>Debugger</Filter>
+    </ClCompile>
     <ClCompile Include="Debugger\ModuleModel.cpp">
       <Filter>Debugger</Filter>
     </ClCompile>
@@ -529,6 +532,9 @@
       <Filter>Settings</Filter>
     </QtMoc>
     <QtMoc Include="Debugger\ModuleView.h">
+      <Filter>Debugger</Filter>
+    </QtMoc>
+    <QtMoc Include="Debugger\GoalReplView.h">
       <Filter>Debugger</Filter>
     </QtMoc>
     <QtMoc Include="Debugger\NavigationHistoryStack.h">

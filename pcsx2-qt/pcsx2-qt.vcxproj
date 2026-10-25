@@ -125,6 +125,7 @@
     <ClCompile Include="Debugger\ThreadView.cpp" />
     <ClCompile Include="Debugger\ModuleModel.cpp" />
     <ClCompile Include="Debugger\ModuleView.cpp" />
+    <ClCompile Include="Debugger\GoalReplView.cpp" />
     <ClCompile Include="Debugger\Breakpoints\BreakpointDialog.cpp" />
     <ClCompile Include="Debugger\Breakpoints\BreakpointModel.cpp" />
     <ClCompile Include="Debugger\Breakpoints\BreakpointView.cpp" />
@@ -248,6 +249,7 @@
     <QtMoc Include="Debugger\StackView.h" />
     <QtMoc Include="Debugger\ModuleModel.h" />
     <QtMoc Include="Debugger\ModuleView.h" />
+    <QtMoc Include="Debugger\GoalReplView.h" />
     <QtMoc Include="Debugger\NavigationHistoryStack.h" />
     <QtMoc Include="Debugger\ThreadModel.h" />
     <QtMoc Include="Debugger\ThreadView.h" />

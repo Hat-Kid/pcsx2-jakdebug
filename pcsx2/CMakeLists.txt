@@ -8,6 +8,7 @@ else()
 	add_library(PCSX2)
 endif()
 target_link_libraries(PCSX2 PRIVATE PCSX2_FLAGS)
+target_link_libraries(PCSX2_FLAGS INTERFACE rapidjson)
 
 target_compile_features(PCSX2_FLAGS INTERFACE cxx_std_17)
 target_compile_definitions(PCSX2_FLAGS INTERFACE "${PCSX2_DEFS}")
@@ -962,6 +963,31 @@ set(pcsx2RDebugHeaders
 	RDebug/deci2_netmp.h
 	RDebug/deci2_ttyp.h)
 
+# Jak / GOAL debugging sources
+set(pcsx2JakSources
+	Jak/GoalCaller.cpp
+	Jak/GoalInspector.cpp
+	Jak/GoalRepl.cpp
+	Jak/GoalReplServer.cpp
+	Jak/GoalRuntime.cpp
+	Jak/GoalSymbolNames.cpp
+	Jak/GoalTypeDb.cpp
+	Jak/JakGoalDebugInspect.cpp
+	Jak/Lzo.cpp
+)
+
+set(pcsx2JakHeaders
+	Jak/GoalCaller.h
+	Jak/GoalInspector.h
+	Jak/GoalRepl.h
+	Jak/GoalReplServer.h
+	Jak/GoalRuntime.h
+	Jak/GoalSymbolNames.h
+	Jak/GoalTypeDb.h
+	Jak/JakGoalDebugInspect.h
+	Jak/Lzo.h
+)
+
 # Recording sources
 set(rec_src "Recording")
 set(rec_vp_src "${rec_src}/VirtualPad")
@@ -1101,6 +1127,8 @@ target_sources(PCSX2 PRIVATE
 	${pcsx2PADHeaders}
 	${pcsx2PADSources}
 	${pcsx2RecordingSources}
+	${pcsx2JakSources}
+	${pcsx2JakHeaders}
 	${pcsx2DebugToolsSources}
 	${pcsx2DebugToolsHeaders}
 	${pcsx2HostSources}
@@ -1283,6 +1311,12 @@ function(setup_main_executable target)
 		endif()
 		pcsx2_resource(${target} ${path} ${CMAKE_SOURCE_DIR}/bin/resources/)
 	endforeach()
+
+	# bundled patches, also searched next to the executable (see Patch::FindPatchFilesOnDisk)
+	if(NOT WIN32 AND NOT APPLE)
+		add_custom_command(TARGET ${target} POST_BUILD COMMAND "${CMAKE_COMMAND}" -E copy_directory
+			"${CMAKE_SOURCE_DIR}/bin/patches" "$<TARGET_FILE_DIR:${target}>/patches")
+	endif()
 
 	# Add docs to resources for not-Windows, since they don't use the bin directory.
 	if(NOT WIN32)

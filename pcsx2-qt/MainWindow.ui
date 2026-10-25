@@ -201,6 +201,13 @@
      <addaction name="actionInputRecConsoleLogs"/>
      <addaction name="actionInputRecControllerLogs"/>
     </widget>
+    <widget class="QMenu" name="menuJakDebugging">
+     <property name="title">
+      <string>&amp;Jak Debugging</string>
+     </property>
+     <addaction name="actionEnableJakFunctionAnalysis"/>
+     <addaction name="actionEnableJakReplServer"/>
+    </widget>
     <addaction name="actionOpenDataDirectory"/>
     <addaction name="actionCoverDownloader"/>
     <addaction name="actionControllerTester"/>
@@ -211,6 +218,7 @@
     <addaction name="actionReloadPatches"/>
     <addaction name="separator"/>
     <addaction name="menuInputRecording"/>
+    <addaction name="menuJakDebugging"/>
     <addaction name="separator"/>
     <addaction name="actionEnableSystemConsole"/>
     <addaction name="actionEnableDebugConsole"/>
@@ -890,6 +898,22 @@
    </property>
    <property name="text">
     <string>&amp;Open Debugger</string>
+   </property>
+  </action>
+  <action name="actionEnableJakFunctionAnalysis">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable GOAL Call Analysis (slow)</string>
+   </property>
+  </action>
+  <action name="actionEnableJakReplServer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Enable GOAL REPL Server (localhost)</string>
    </property>
   </action>
   <action name="actionReloadPatches">

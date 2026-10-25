@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "R5900OpcodeTables.h"
 #include "x86/iR5900.h"
+#include "Jak/JakGoalDebugInspect.h"
 
 using namespace x86Emitter;
 
@@ -123,6 +124,13 @@ void recJR()
 void recJALR()
 {
 	EE::Profiler.EmitOp(eeOpcode::JALR);
+
+	// goal calls are always jalr ra, t9
+	if (GoalAnalysis::ShouldHookCallSites() && _Rs_ == 25 && _Rd_ == 31)
+	{
+		GoalAnalysis::NoteCallSite(pc + 4);
+		recGoalAnalysisHook(reinterpret_cast<const void*>(GoalAnalysis::OnCallSite), pc + 4);
+	}
 
 	const u32 newpc = pc + 4;
 	const bool swap = (EmuConfig.Gamefixes.GoemonTlbHack || _Rd_ == _Rs_) ? false : TrySwapDelaySlot(_Rs_, 0, _Rd_, true);

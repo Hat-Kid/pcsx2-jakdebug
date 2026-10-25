@@ -518,6 +518,12 @@ void GoemonUnloadTlb(u32 key)
 // Generates a tlbMiss Exception
 static __ri void vtlb_Miss(u32 addr, u32 mode)
 {
+	if (g_eeIsolatedExecution)
+	{
+		g_eeIsolatedFault = true;
+		return;
+	}
+
 	if (EmuConfig.Gamefixes.GoemonTlbHack)
 		GoemonTlbMissDebug();
 
@@ -554,6 +560,12 @@ static __ri void vtlb_Miss(u32 addr, u32 mode)
 // time of the exception.
 static __ri void vtlb_BusError(u32 addr, u32 mode)
 {
+	if (g_eeIsolatedExecution)
+	{
+		g_eeIsolatedFault = true;
+		return;
+	}
+
 	const std::string message(fmt::format("Bus Error, addr=0x{:x} [{}]", addr, mode ? "store" : "load"));
 	if (EmuConfig.Cpu.Recompiler.PauseOnTLBMiss)
 	{

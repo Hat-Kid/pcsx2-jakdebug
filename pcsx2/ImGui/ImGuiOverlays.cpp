@@ -22,6 +22,7 @@
 #include "ImGui/ImGuiManager.h"
 #include "ImGui/ImGuiOverlays.h"
 #include "Input/InputManager.h"
+#include "Jak/JakGoalDebugInspect.h"
 #include "MTGS.h"
 #include "Patch.h"
 #include "PerformanceMetrics.h"
@@ -364,6 +365,9 @@ __ri void ImGuiManager::DrawPerformanceOverlay(float& position_y, float scale, f
 
 				DRAW_LINE(osd_font, font_size, s_speed_line.c_str(), s_speed_line_color);
 			}
+
+			if (const std::string jak_line = GoalAnalysis::OverlayText(); !jak_line.empty())
+				DRAW_LINE(osd_font, font_size, jak_line.c_str(), IM_COL32(255, 85, 0, 255));
 
 			if (GSConfig.OsdShowGSStats)
 			{

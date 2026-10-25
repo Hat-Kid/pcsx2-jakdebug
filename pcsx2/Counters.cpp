@@ -13,6 +13,7 @@
 #include "GS/GS.h"
 #include "MTGS.h"
 #include "PerformanceMetrics.h"
+#include "Jak/JakGoalDebugInspect.h"
 #include "Patch.h"
 #include "ps2/HwInternal.h"
 #include "SIO/Sio.h"
@@ -491,6 +492,7 @@ static __fi void VSyncStart(u64 sCycle)
 	// End-of-frame tasks.
 	DoFMVSwitch();
 	VMManager::Internal::VSyncOnCPUThread();
+	GoalAnalysis::OnVSync(g_FrameCount);
 
 	// Don't bother throttling if we're going to pause.
 	if (!VMManager::Internal::IsExecutionInterrupted())

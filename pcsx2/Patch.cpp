@@ -332,24 +332,30 @@ std::string Patch::GetPnachTemplate(const std::string_view serial, u32 crc, bool
 
 std::vector<std::string> Patch::FindPatchFilesOnDisk(const std::string_view serial, u32 crc, bool cheats, bool all_crcs)
 {
-	FileSystem::FindResultsArray files;
-	FileSystem::FindFiles(cheats ? EmuFolders::Cheats.c_str() : EmuFolders::Patches.c_str(),
-		GetPnachTemplate(serial, crc, true, true, all_crcs).c_str(),
-		FILESYSTEM_FIND_FILES | FILESYSTEM_FIND_HIDDEN_FILES, &files);
+	std::vector<std::string> dirs = {cheats ? EmuFolders::Cheats : EmuFolders::Patches};
+
+	// patches shipped next to the executable (bin/patches, e.g. the jak debug mode patches)
+	if (!cheats)
+	{
+		std::string bundled = Path::Combine(EmuFolders::AppRoot, "patches");
+		if (bundled != EmuFolders::Patches && FileSystem::DirectoryExists(bundled.c_str()))
+			dirs.push_back(std::move(bundled));
+	}
 
 	std::vector<std::string> ret;
-	ret.reserve(files.size());
+	for (const std::string& dir : dirs)
+	{
+		FileSystem::FindResultsArray files;
+		FileSystem::FindFiles(dir.c_str(), GetPnachTemplate(serial, crc, true, true, all_crcs).c_str(),
+			FILESYSTEM_FIND_FILES | FILESYSTEM_FIND_HIDDEN_FILES, &files);
 
-	for (FILESYSTEM_FIND_DATA& fd : files)
-		ret.push_back(std::move(fd.FileName));
+		// and patches without serials
+		FileSystem::FindFiles(dir.c_str(), GetPnachTemplate(serial, crc, false, true, false).c_str(),
+			FILESYSTEM_FIND_FILES | FILESYSTEM_FIND_HIDDEN_FILES | FILESYSTEM_FIND_KEEP_ARRAY, &files);
 
-	// and patches without serials
-	FileSystem::FindFiles(cheats ? EmuFolders::Cheats.c_str() : EmuFolders::Patches.c_str(),
-		GetPnachTemplate(serial, crc, false, true, false).c_str(), FILESYSTEM_FIND_FILES | FILESYSTEM_FIND_HIDDEN_FILES,
-		&files);
-	ret.reserve(ret.size() + files.size());
-	for (FILESYSTEM_FIND_DATA& fd : files)
-		ret.push_back(std::move(fd.FileName));
+		for (FILESYSTEM_FIND_DATA& fd : files)
+			ret.push_back(std::move(fd.FileName));
+	}
 
 	return ret;
 }

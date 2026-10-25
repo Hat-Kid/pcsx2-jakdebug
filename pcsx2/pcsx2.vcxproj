@@ -34,6 +34,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DepsIncludeDir)\plutovg;$(DepsIncludeDir)\plutosvg</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DepsIncludeDir)\SDL3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)3rdparty\rapidjson\include</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DepsIncludeDir)\freetype2</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)3rdparty\include</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SolutionDir)3rdparty\fmt\include</AdditionalIncludeDirectories>
@@ -370,6 +371,15 @@
     <ClCompile Include="IopGte.cpp" />
     <ClCompile Include="LayeredSettingsInterface.cpp" />
     <ClCompile Include="PINE.cpp" />
+    <ClCompile Include="Jak\GoalCaller.cpp" />
+    <ClCompile Include="Jak\GoalInspector.cpp" />
+    <ClCompile Include="Jak\GoalRepl.cpp" />
+    <ClCompile Include="Jak\GoalReplServer.cpp" />
+    <ClCompile Include="Jak\GoalRuntime.cpp" />
+    <ClCompile Include="Jak\GoalSymbolNames.cpp" />
+    <ClCompile Include="Jak\GoalTypeDb.cpp" />
+    <ClCompile Include="Jak\JakGoalDebugInspect.cpp" />
+    <ClCompile Include="Jak\Lzo.cpp" />
     <ClCompile Include="FW.cpp" />
     <ClCompile Include="PerformanceMetrics.cpp" />
     <ClCompile Include="Recording\InputRecording.cpp" />
@@ -817,6 +827,15 @@
     <ClInclude Include="IPU\mpeg2_vlc.h" />
     <ClInclude Include="LayeredSettingsInterface.h" />
     <ClInclude Include="PINE.h" />
+    <ClInclude Include="Jak\GoalCaller.h" />
+    <ClInclude Include="Jak\GoalInspector.h" />
+    <ClInclude Include="Jak\GoalRepl.h" />
+    <ClInclude Include="Jak\GoalReplServer.h" />
+    <ClInclude Include="Jak\GoalRuntime.h" />
+    <ClInclude Include="Jak\GoalSymbolNames.h" />
+    <ClInclude Include="Jak\GoalTypeDb.h" />
+    <ClInclude Include="Jak\JakGoalDebugInspect.h" />
+    <ClInclude Include="Jak\Lzo.h" />
     <ClInclude Include="FW.h" />
     <ClInclude Include="PerformanceMetrics.h" />
     <ClInclude Include="Recording\InputRecording.h" />
